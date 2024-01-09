@@ -123,9 +123,10 @@ FROM
 /* hint -
 select *from customer; -- customer_id, name
 select *from payment; -- customer_id, amount
+select *from payment;
+select *from rental;
 */
 
-select *from rental;
 SELECT 
     CONCAT(first_name,' ', last_name) AS customer_name,
     SUM(amount) AS Total_Rental_spent
@@ -133,7 +134,7 @@ FROM
     customer
     left join rental on rental.customer_id = customer.customer_id
         JOIN
-    payment ON customer.customer_id = payment.payment_id
+    payment ON customer.customer_id = payment.customer_id
     
 GROUP BY customer_name;
 
@@ -178,11 +179,20 @@ LIMIT 5;
 
 -- Question 6. Determine the customers who have rented movies from both stores (store ID 1 and store ID 2). 
 -- Solution:-
-select *from rental; -- rental_id, customer_id, inventory_id
+select *from rental order by customer_id; -- rental_id, customer_id, inventory_id
 select * from customer ; -- customer_id , store_id
-select * from inventory; -- inventory_id, store_id
-select * from rental join customer on  rental.customer_id = customer.customer_id 
-join inventory on inventory.inventory_id = rental.inventory_id where customer.customer_id in 
-( select customer_id from customer where store_id = 1 and store_id = 2);
+
+SELECT first_name, last_name, email
+FROM customer
+JOIN rental ON customer.customer_id = rental.customer_id
+WHERE customer.customer_id IN (
+    SELECT customer_id
+    FROM rental
+    WHERE store_id IN (1, 2)
+    GROUP BY customer_id
+    HAVING COUNT(DISTINCT store_id) = 2
+)
+ORDER BY customer.customer_id;
+
 
 
