@@ -132,11 +132,11 @@ SELECT
     SUM(amount) AS Total_Rental_spent
 FROM
     customer
-    left join rental on rental.customer_id = customer.customer_id
+    join rental on rental.customer_id = customer.customer_id
         JOIN
     payment ON customer.customer_id = payment.customer_id
     
-GROUP BY customer_name;
+GROUP BY customer.customer_id;
 
 
 -- Question 4. List the titles of movies rented by each customer in a particular city (e.g., 'London'). 
@@ -185,14 +185,11 @@ select * from customer ; -- customer_id , store_id
 SELECT first_name, last_name, email
 FROM customer
 JOIN rental ON customer.customer_id = rental.customer_id
-WHERE customer.customer_id IN (
-    SELECT customer_id
-    FROM rental
-    WHERE store_id IN (1, 2)
-    GROUP BY customer_id
-    HAVING COUNT(DISTINCT store_id) = 2
-)
-ORDER BY customer.customer_id;
+join inventory on rental.inventory_id = inventory.inventory_id
+join store on inventory.store_id = store.store_id
+WHERE store.store_id in (1,2)
+    GROUP BY customer.customer_id
+    HAVING COUNT(DISTINCT store.store_id) = 2;
 
 
 
